@@ -14,10 +14,27 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    import-tree = {
-      url = "github:vic/import-tree";
+    catppuccin = {
+      url = "github:catppuccin/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixcord = {
+      url = "github:FlameFlag/nixcord";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    spicetify = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    import-tree.url = "github:vic/import-tree";
   };
 
   outputs = { self, nixpkgs, systems, ... }@inputs:
