@@ -1,6 +1,4 @@
-{ config, lib, pkgs, ... }:
-
-{
+{ pkgs, ... }: {
   imports = [ ./hardware-configuration.nix ];
 
   boot = {
@@ -9,15 +7,18 @@
     plymouth.enable = true;
   };
 
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    auto-optimise-store = true;
+    trusted-users = [ "scalet" ];
+  };
+
   networking = {
     hostName = "LetOS";
-    networkmanager.enable = true;
-    nftables.enable = true;
 
-    firewall = {
-      enable = true;
-      # allowedTCPPorts = [ ];
-    };
+    networkmanager.enable = true;
+
+    firewall.enable = true;
   };
 
   time.timeZone = "America/Sao_Paulo";
@@ -59,6 +60,8 @@
 
   programs.niri.enable = true;
 
+  programs.git.enable = true;
+
   programs.neovim = {
     enable = true;
     viAlias = true;
@@ -66,15 +69,10 @@
   };
 
   programs.mtr.enable = true;
+
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
-  };
-
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "backup";
   };
 
   environment.systemPackages = with pkgs; [
@@ -89,15 +87,15 @@
     enable = true;
     settings = {
       default_session = {
-        command = ''
-          ${pkgs.tuigreet}/bin/tuigreet \
-            --greeting 'Welcome to ${config.networking.hostName}' \
-            --asterisks \
-            --remember \
-            --remember-user-session \
-            --time \
-            --cmd niri
-        '';
+        command = # bash
+          ''
+            ${pkgs.tuigreet}/bin/tuigreet \
+              --asterisks \
+              --remember \
+              --remember-user-session \
+              --time \
+              --cmd niri-session
+          '';
         user = "greeter";
       };
     };
@@ -105,4 +103,3 @@
 
   system.stateVersion = "25.11";
 }
-

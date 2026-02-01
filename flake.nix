@@ -13,19 +13,43 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-  };
 
-  outputs = { nixpkgs, ... }@inputs: {
-    nixosConfigurations."LetOS" = nixpkgs.lib.nixosSystem {
-      specialArgs = { inherit inputs; };
-      modules = [
-        inputs.disko.nixosModules.default
-        (import ./disko.nix { device = "/dev/vda"; })
-
-        ./configuration.nix
-
-        inputs.home-manager.nixosModules.default
-      ];
+    import-tree = {
+      url = "github:vic/import-tree";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
+  outputs = { self, nixpkgs, systems, ... }@inputs:
+    let
+      inherit (nixpkgs) lib;
+
+      eachSystem = f:
+        lib.genAttrs (import systems) (system:
+          f {
+            inherit system;
+            pkgs = nixpkgs.legacyPackages.${system};
+          });
+
+      eachHost = lib.genAttrs (builtins.attrNames
+        (lib.filterAttrs (_n: v: v == "directory") (builtins.readDir ./hosts)));
+
+    in {
+      nixosConfigurations = eachHost (host:
+        lib.nixosSystem {
+          specialArgs = { inherit inputs self; };
+          modules =
+            [ ./hosts/${host}/configuration.nix self.nixosModules.default ];
+        });
+
+      packages = eachSystem ({ pkgs, system }: {
+        inherit (pkgs) hello;
+        default = self.packages.${system}.hello;
+      });
+
+      nixosModules = {
+        let-dev = inputs.import-tree ./modules;
+        default = self.nixosModules.let-dev;
+      };
+    };
 }
