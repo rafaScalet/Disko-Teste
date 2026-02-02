@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, host, ... }: {
   imports = [ ./hardware-configuration.nix ];
 
   boot = {
@@ -14,7 +14,7 @@
   };
 
   networking = {
-    hostName = "LetOS";
+    hostName = host;
 
     networkmanager.enable = true;
 

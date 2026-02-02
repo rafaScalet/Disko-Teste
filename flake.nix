@@ -54,7 +54,7 @@
     in {
       nixosConfigurations = eachHost (host:
         lib.nixosSystem {
-          specialArgs = { inherit inputs self; };
+          specialArgs = { inherit inputs self host; };
           modules =
             [ ./hosts/${host}/configuration.nix self.nixosModules.default ];
         });
